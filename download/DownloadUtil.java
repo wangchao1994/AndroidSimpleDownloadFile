@@ -24,7 +24,7 @@ import retrofit2.Response;
 public class DownloadUtil {
     private static final String TAG = DownloadUtil.class.getSimpleName();
     private static final String PATH_CHALLENGE_VIDEO = Environment.getExternalStorageDirectory() + "/Download";
-    private static final String URL = "";
+    private static final String URL = "https://sapi.daishumovie.com/";
     private String mVideoPath;
 
 
