@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.androidretrofitdownload.download.DownloadUtil;
 import com.android.androidretrofitdownload.listener.DownloadListener;
@@ -18,6 +19,7 @@ import com.android.androidretrofitdownload.util.permission.KbPermission;
 import com.android.androidretrofitdownload.util.permission.KbPermissionListener;
 import com.android.androidretrofitdownload.util.permission.KbPermissionUtils;
 import com.android.androidretrofitdownload.view.KbWithWordsCircleProgressBar;
+import com.bumptech.glide.Glide;
 
 public class DownloadVideoActivity extends AppCompatActivity implements View.OnClickListener{
     private static final String PICTURE_URL = "http://small-bronze.oss-cn-shanghai.aliyuncs.com/" +
@@ -43,6 +45,7 @@ public class DownloadVideoActivity extends AppCompatActivity implements View.OnC
         mCircleProgressLayout = findViewById(R.id.fl_circle_progress);
         mCircleProgress = findViewById(R.id.circle_progress);
 
+        downloadPicture();
         if (KbPermissionUtils.needRequestPermission()){
             KbPermission.with(this)
                     .requestCode(100)
@@ -65,28 +68,52 @@ public class DownloadVideoActivity extends AppCompatActivity implements View.OnC
         downloadUtil.downLoadFile(PICTURE_URL, new DownloadListener() {
             @Override
             public void onStart() {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCircleProgressLayout.setVisibility(View.VISIBLE);
+                    }
+                });
             }
 
             @Override
-            public void onProgress(int currentLength) {
-
+            public void onProgress(final int currentLength) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCircleProgress.setProgress(currentLength);
+                    }
+                });
             }
 
             @Override
-            public void onFinish(String localPath) {
-
+            public void onFinish(final String localPath) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCircleProgressLayout.setVisibility(View.GONE);
+                        Glide.with(mContext).load(localPath).into(mPicture);
+                    }
+                });
             }
 
             @Override
             public void onFailure(String erroInfo) {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCircleProgressLayout.setVisibility(View.GONE);
+                        Toast.makeText(mContext,"Error!",Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
 
     @Override
     public void onClick(View v) {
-
+        if (v == mBackLayout) {
+            finish();
+        }
     }
 }
